@@ -22,10 +22,11 @@ const LoginPage = ({ username, pwd, onChangeUsername, onChangePwd, onClickLogin 
   )
 }
 
-const BlogsPage = ({ blogs }) => {
+const BlogsPage = ({ blogs, user }) => {
   return (
     <div>
       <h2>Blogs</h2>
+      <p>{user.name} logged in.</p>
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
@@ -64,7 +65,7 @@ const App = () => {
       {
         user === null
           ? (<LoginPage username={username} pwd={pwd} onChangeUsername={onChangeUsername} onChangePwd={onChangePwd} onClickLogin={onClickLogin} />)
-          : (<BlogsPage blogs={blogs} />)
+          : (<BlogsPage blogs={blogs} user={user} />)
       }
     </div>
   )
