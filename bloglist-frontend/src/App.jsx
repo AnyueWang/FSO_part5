@@ -1,59 +1,10 @@
 import { useState, useEffect } from 'react'
-import Blog from './components/Blog'
+import BlogsPage from './components/BlogsPage'
+import LoginPage from './components/LoginPage'
+import Message from './components/Message'
 import blogService from './services/blogs'
 import loginService from './services/login'
-
-const LoginPage = ({ username, pwd, onChangeUsername, onChangePwd, onClickLogin }) => {
-  return (
-    <div>
-      <h2>Log in to application</h2>
-      <form onSubmit={onClickLogin}>
-        <div>
-          <label htmlFor="username">Username: </label>
-          <input type="text" id='username' onChange={onChangeUsername} value={username} />
-        </div>
-        <div>
-          <label htmlFor="pwd">Password: </label>
-          <input type="password" id='pwd' onChange={onChangePwd} value={pwd} />
-        </div>
-        <button type='submit'>Login</button>
-      </form>
-    </div>
-  )
-}
-
-const BlogsPage = ({ blogs, user, title, author, url, onChangeTitle, onChangeAuthor, onChangeUrl, onClickLogout, onClickCreate }) => {
-  return (
-    <div>
-      <h2>Blogs</h2>
-      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-        <p>{user.name} logged in.</p>
-        <button onClick={onClickLogout}>Logout</button>
-      </div>
-      <h2>Create a new blog</h2>
-      <div>
-        <form>
-          <div>
-            <label htmlFor="title">Title:</label>
-            <input type="text" id='title' onChange={onChangeTitle} value={title} />
-          </div>
-          <div>
-            <label htmlFor="author">Author:</label>
-            <input type="text" id='author' onChange={onChangeAuthor} value={author} />
-          </div>
-          <div>
-            <label htmlFor="url">Url:</label>
-            <input type="text" id='url' onChange={onChangeUrl} value={url} />
-          </div>
-          <button type='submit' onClick={onClickCreate}>Create</button>
-        </form>
-      </div>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
-      )}
-    </div>
-  )
-}
+import './styles.css'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -63,6 +14,8 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const [operationMessage, setOperationMessage] = useState(null)
+  const [warningMessage, setWarningMessage] = useState(null)
   const strLoggedinUser = "loggedinUser"
 
   const onChangeUsername = (event) => {
@@ -88,6 +41,12 @@ const App = () => {
         setUser(loggedinUser)
         blogService.setUserToken(loggedinUser.token)
         localStorage.setItem(strLoggedinUser, JSON.stringify(loggedinUser))
+        setOperationMessage('You have been logged in.')
+        setTimeout(() => setOperationMessage(null), 5000)
+      })
+      .catch(error => {
+        setWarningMessage(error.response.data.error)
+        setTimeout(() => setWarningMessage(null), 5000)
       })
     setUsername('')
     setPwd('')
@@ -100,6 +59,8 @@ const App = () => {
     localStorage.removeItem(strLoggedinUser)
     setUser(null)
     blogService.setUserToken(null)
+    setOperationMessage('You have been logged out.')
+    setTimeout(() => setOperationMessage(null), 5000)
   }
   const onClickCreate = (event) => {
     event.preventDefault()
@@ -108,10 +69,16 @@ const App = () => {
       .then(newBlog => {
         const updatedBlogs = blogs.concat(newBlog)
         setBlogs(updatedBlogs)
+        setOperationMessage(`A new Blog "${title}" by ${author} added.`)
+        setTimeout(() => setOperationMessage(null), 5000)
       })
-      setTitle('')
-      setAuthor('')
-      setUrl('')
+      .catch(error => {
+        setWarningMessage(error.response.data.error)
+        setTimeout(() => setWarningMessage(null), 5000)
+      })
+    setTitle('')
+    setAuthor('')
+    setUrl('')
   }
 
   useEffect(() => {
@@ -128,6 +95,9 @@ const App = () => {
 
   return (
     <div>
+      <h1>{user === null ? 'Log in to application' : 'Blogs'}</h1>
+      <Message.OperationMessage operationMessage={operationMessage} />
+      <Message.WarningMessage warningMessage={warningMessage} />
       {
         user === null
           ? (<LoginPage
@@ -140,12 +110,8 @@ const App = () => {
           : (<BlogsPage
             blogs={blogs}
             user={user}
-            title={title}
-            author={author}
-            url={url}
-            onChangeTitle={onChangeTitle}
-            onChangeAuthor={onChangeAuthor}
-            onChangeUrl={onChangeUrl}
+            newBlogInfo={{ title, author, url }}
+            onChangeNewBlogInfo={{ onChangeTitle, onChangeAuthor, onChangeUrl }}
             onClickLogout={onClickLogout}
             onClickCreate={onClickCreate}
           />)

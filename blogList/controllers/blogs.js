@@ -40,7 +40,7 @@ blogsRouter.post('/', middleware.userExtractor, async (req, res, next) => {
         }
         if (user) { blogInput = { ...blogInput, user: user.id } }
         const blog = new Blog(blogInput)
-        if (body.title && body.url) {
+        if (body.title && body.author) {
             const savedBlog = await blog.save()
             if (user) {
                 user.blogs = user.blogs.concat(savedBlog.id)
@@ -48,7 +48,7 @@ blogsRouter.post('/', middleware.userExtractor, async (req, res, next) => {
             }
             res.status(201).json(savedBlog)
         } else {
-            res.status(400).end()
+            res.status(400).json({ error: 'Missing title or author' })
         }
     } catch (exception) {
         next(exception)
@@ -83,7 +83,7 @@ blogsRouter.put('/:id', middleware.userExtractor, async (req, res, next) => {
         const loginUserId = loginUser.id
         const blogUserId = blog.user ? blog.user.toString() : false
         if (blogUserId === loginUserId) {
-            const result = await Blog.findByIdAndUpdate(blogId, {...req.body, user:loginUserId}, { new: true })
+            const result = await Blog.findByIdAndUpdate(blogId, { ...req.body, user: loginUserId }, { new: true })
             res.json(result)
         } else {
             return res.status(401).send({ error: 'you are unauthorized to delete the blog' })
