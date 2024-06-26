@@ -11,4 +11,12 @@ const getAll = () => {
   return request.then(response => response.data)
 }
 
-export default { getAll, setUserToken }
+const create = (info) => {
+  const config = {
+    headers: {Authorization: userToken}
+  }
+  const request = axios.post(baseUrl, info, config )
+  return request.then(response => response.data)
+}
+
+export default { getAll, setUserToken, create }
