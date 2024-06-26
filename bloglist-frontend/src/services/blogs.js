@@ -13,9 +13,9 @@ const getAll = () => {
 
 const create = (info) => {
   const config = {
-    headers: {Authorization: userToken}
+    headers: { Authorization: userToken }
   }
-  const request = axios.post(baseUrl, info, config )
+  const request = axios.post(baseUrl, info, config)
   return request.then(response => response.data)
 }
 
