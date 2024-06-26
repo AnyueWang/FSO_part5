@@ -22,11 +22,14 @@ const LoginPage = ({ username, pwd, onChangeUsername, onChangePwd, onClickLogin 
   )
 }
 
-const BlogsPage = ({ blogs, user }) => {
+const BlogsPage = ({ blogs, user, onClickLogout }) => {
   return (
     <div>
       <h2>Blogs</h2>
-      <p>{user.name} logged in.</p>
+      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <p>{user.name} logged in.</p>
+        <button onClick={onClickLogout}>Logout</button>
+      </div>
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
@@ -39,6 +42,8 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [pwd, setPwd] = useState('')
   const [user, setUser] = useState(null)
+  const strLoggedinUser = "loggedinUser"
+
   const onChangeUsername = (event) => {
     setUsername(event.target.value)
   }
@@ -49,23 +54,48 @@ const App = () => {
     event.preventDefault()
     loginService
       .login(username, pwd)
-      .then(loggedinUser => setUser(loggedinUser))
+      .then(loggedinUser => {
+        setUser(loggedinUser)
+        blogService.setUserToken(loggedinUser.token)
+        localStorage.setItem(strLoggedinUser, JSON.stringify(loggedinUser))
+      })
     setUsername('')
     setPwd('')
   }
+  const onClickLogout = (event) => {
+    event.preventDefault()
+    localStorage.removeItem(strLoggedinUser)
+    setUser(null)
+  }
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
-    )
+    const loggedinUser = localStorage.getItem(strLoggedinUser)
+    if (loggedinUser) {
+      const user = JSON.parse(loggedinUser)
+      setUser(user)
+      blogService.setUserToken(user.token)
+      blogService.getAll().then(blogs =>
+        setBlogs(blogs)
+      )
+    }
   }, [])
 
   return (
     <div>
       {
         user === null
-          ? (<LoginPage username={username} pwd={pwd} onChangeUsername={onChangeUsername} onChangePwd={onChangePwd} onClickLogin={onClickLogin} />)
-          : (<BlogsPage blogs={blogs} user={user} />)
+          ? (<LoginPage
+            username={username}
+            pwd={pwd}
+            onChangeUsername={onChangeUsername}
+            onChangePwd={onChangePwd}
+            onClickLogin={onClickLogin}
+          />)
+          : (<BlogsPage
+            blogs={blogs}
+            user={user} 
+            onClickLogout={onClickLogout}
+            />)
       }
     </div>
   )
