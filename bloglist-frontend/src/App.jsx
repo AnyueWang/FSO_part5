@@ -64,6 +64,22 @@ const App = () => {
         setTimeout(() => setWarningMessage(null), 5000)
       })
   }
+  const addLike = (blogObject) => {
+    const updatedBlogObject = { ...blogObject, likes: blogObject.likes + 1 }
+    blogService
+      .update(updatedBlogObject)
+      .then(updatedBlog => {
+        const targetBlog = blogs.find(blog => blog.id === updatedBlog.id)
+        targetBlog.likes++
+        setBlogs([...blogs])
+        setOperationMessage(`You like the blog "${targetBlog.title}."`)
+        setTimeout(() => setOperationMessage(null), 5000)
+      })
+      .catch(error => {
+        setWarningMessage(error.response.data.error)
+        setTimeout(() => setWarningMessage(null), 5000)
+      })
+  }
 
   useEffect(() => {
     const loggedinUser = localStorage.getItem(strLoggedinUser)
@@ -96,6 +112,7 @@ const App = () => {
             user={user}
             onClickLogout={onClickLogout}
             createBlog={createBlog}
+            addLike={addLike}
           />)
       }
     </div>

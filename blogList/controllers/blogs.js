@@ -1,6 +1,7 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const middleware = require('../utils/middleware')
+const _ = require('lodash')
 
 blogsRouter.get('/', async (req, res, next) => {
     try {
@@ -86,7 +87,18 @@ blogsRouter.put('/:id', middleware.userExtractor, async (req, res, next) => {
             const result = await Blog.findByIdAndUpdate(blogId, { ...req.body, user: loginUserId }, { new: true })
             res.json(result)
         } else {
-            return res.status(401).send({ error: 'you are unauthorized to delete the blog' })
+            const isAddLike = (
+                req.body.title === blog.title
+                && req.body.author === blog.author
+                && req.body.url === blog.url
+                && req.body.likes === blog.likes + 1
+            )
+            if (isAddLike) {
+                const result = await Blog.findByIdAndUpdate(blogId, { ...req.body, user: loginUserId }, { new: true })
+                res.json(result)
+            } else {
+                return res.status(401).send({ error: 'you are unauthorized to update the blog' })
+            }
         }
     } catch (exception) {
         next(exception)
@@ -94,3 +106,4 @@ blogsRouter.put('/:id', middleware.userExtractor, async (req, res, next) => {
 })
 
 module.exports = blogsRouter
+

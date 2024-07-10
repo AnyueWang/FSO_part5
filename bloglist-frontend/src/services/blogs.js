@@ -11,12 +11,20 @@ const getAll = () => {
   return request.then(response => response.data)
 }
 
-const create = (info) => {
+const create = (object) => {
   const config = {
     headers: { Authorization: userToken }
   }
-  const request = axios.post(baseUrl, info, config)
+  const request = axios.post(baseUrl, object, config)
   return request.then(response => response.data)
 }
 
-export default { getAll, setUserToken, create }
+const update = (object) => {
+  const config = {
+    headers: { Authorization: userToken }
+  }
+  const request = axios.put(`${baseUrl}/${object.id}`, object, config)
+  return request.then(response => response.data)
+}
+
+export default { getAll, setUserToken, create, update }
