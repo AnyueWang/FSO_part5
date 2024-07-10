@@ -81,13 +81,18 @@ const App = () => {
       });
   };
   const removeBlog = (blog) => {
-    blogService.remove(blog.id)
-    const updatedBlogs = blogs.filter((eachBlog) => {
-      if (eachBlog.id !== blog.id) return eachBlog;
+    blogService.remove(blog.id).then(() => {
+      const updatedBlogs = blogs.filter((eachBlog) => {
+        if (eachBlog.id !== blog.id) return eachBlog;
+      })
+      setBlogs(updatedBlogs);
+      setOperationMessage(`You have deleted the blog "${blog.title}."`);
+      setTimeout(() => setOperationMessage(null), 5000);
     })
-    setBlogs(updatedBlogs);
-    setOperationMessage(`You have deleted the blog "${blog.title}."`);
-    setTimeout(() => setOperationMessage(null), 5000);
+      .catch((error) => {
+        setWarningMessage(error.response.data.error);
+        setTimeout(() => setWarningMessage(null), 5000);
+      })
   };
 
   useEffect(() => {
