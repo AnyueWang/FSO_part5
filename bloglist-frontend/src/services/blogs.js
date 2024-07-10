@@ -27,4 +27,12 @@ const update = (object) => {
   return request.then(response => response.data)
 }
 
-export default { getAll, setUserToken, create, update }
+const remove = (id) => {
+  const config = {
+    headers: { Authorization: userToken }
+  }
+  const request = axios.delete(`${baseUrl}/${id}`, config)
+  return request.then(response => response.data)
+}
+
+export default { getAll, setUserToken, create, update, remove }

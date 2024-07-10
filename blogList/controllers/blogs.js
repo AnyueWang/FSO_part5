@@ -70,7 +70,6 @@ blogsRouter.delete('/:id', middleware.userExtractor, async (req, res, next) => {
         } else {
             return res.status(401).send({ error: 'you are unauthorized to delete the blog' })
         }
-
     } catch (exception) {
         next(exception)
     }

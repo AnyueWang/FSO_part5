@@ -2,7 +2,7 @@ import Blog from './Blog'
 import NewBlog from './NewBlog'
 import NewBlogForm from './NewBlogForm'
 
-const BlogsPage = ({ blogs, user, onClickLogout, createBlog, addLike }) => {
+const BlogsPage = ({ blogs, user, onClickLogout, createBlog, addLike, removeBlog }) => {
   return (
     <div>
       <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -14,8 +14,9 @@ const BlogsPage = ({ blogs, user, onClickLogout, createBlog, addLike }) => {
           createBlog={createBlog}
         />
       </NewBlog>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} addLike={addLike} />
+      {blogs.sort((a, b) => b.likes - a.likes).map(blog =>{
+        return <Blog key={blog.id} blog={blog} addLike={addLike} removeBlog={removeBlog} />
+      }
       )}
     </div>
   )
