@@ -54,7 +54,7 @@ const App = () => {
     blogService
       .create(blogObject)
       .then(newBlog => {
-        const updatedBlogs = blogs.concat(newBlog)
+        const updatedBlogs = blogs.concat(newBlog).sort((a,b)=>b.likes-a.likes)
         setBlogs(updatedBlogs)
         setOperationMessage(`A new Blog "${newBlog.title}" by ${newBlog.author} added.`)
         setTimeout(() => setOperationMessage(null), 5000)
@@ -71,7 +71,7 @@ const App = () => {
       .then(updatedBlog => {
         const targetBlog = blogs.find(blog => blog.id === updatedBlog.id)
         targetBlog.likes++
-        setBlogs([...blogs])
+        setBlogs([...blogs.sort((a,b)=>b.likes-a.likes)])
         setOperationMessage(`You like the blog "${targetBlog.title}."`)
         setTimeout(() => setOperationMessage(null), 5000)
       })
