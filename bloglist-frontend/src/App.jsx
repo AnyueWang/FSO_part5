@@ -11,9 +11,6 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [pwd, setPwd] = useState('')
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const [operationMessage, setOperationMessage] = useState(null)
   const [warningMessage, setWarningMessage] = useState(null)
   const strLoggedinUser = "loggedinUser"
@@ -23,15 +20,6 @@ const App = () => {
   }
   const onChangePwd = (event) => {
     setPwd(event.target.value)
-  }
-  const onChangeTitle = (event) => {
-    setTitle(event.target.value)
-  }
-  const onChangeAuthor = (event) => {
-    setAuthor(event.target.value)
-  }
-  const onChangeUrl = (event) => {
-    setUrl(event.target.value)
   }
   const onClickLogin = (event) => {
     event.preventDefault()
@@ -62,23 +50,19 @@ const App = () => {
     setOperationMessage('You have been logged out.')
     setTimeout(() => setOperationMessage(null), 5000)
   }
-  const onClickCreate = (event) => {
-    event.preventDefault()
+  const createBlog = (blogObject) => {
     blogService
-      .create({ title, author, url })
+      .create(blogObject)
       .then(newBlog => {
         const updatedBlogs = blogs.concat(newBlog)
         setBlogs(updatedBlogs)
-        setOperationMessage(`A new Blog "${title}" by ${author} added.`)
+        setOperationMessage(`A new Blog "${newBlog.title}" by ${newBlog.author} added.`)
         setTimeout(() => setOperationMessage(null), 5000)
       })
       .catch(error => {
         setWarningMessage(error.response.data.error)
         setTimeout(() => setWarningMessage(null), 5000)
       })
-    setTitle('')
-    setAuthor('')
-    setUrl('')
   }
 
   useEffect(() => {
@@ -110,10 +94,8 @@ const App = () => {
           : (<BlogsPage
             blogs={blogs}
             user={user}
-            newBlogInfo={{ title, author, url }}
-            onChangeNewBlogInfo={{ onChangeTitle, onChangeAuthor, onChangeUrl }}
             onClickLogout={onClickLogout}
-            onClickCreate={onClickCreate}
+            createBlog={createBlog}
           />)
       }
     </div>
