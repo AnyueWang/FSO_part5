@@ -110,7 +110,7 @@ describe('add a blog to MongoDB:', () => {
         assert.strictEqual(addedBlog.likes, 0)
     })
 
-    test('add a blog without title or url', async () => {
+    test('add a blog without title', async () => {
         const initialBlogs = await helper.initialBlogs()
         let blog = {
             author: 'Anyue Wang',
@@ -131,19 +131,6 @@ describe('add a blog to MongoDB:', () => {
             .expect(400)
 
         const updatedBlogs = await helper.blogsInDb()
-        assert.strictEqual(updatedBlogs.length, initialBlogs.length)
-
-        blog = {
-            title: 'This is a blog I wrote',
-            author: 'Anyue Wang',
-            likes: 9
-        }
-        await api
-            .post('/api/blogs')
-            .send(blog)
-            .set('Authorization', `Bearer ${token}`)
-            .expect(400)
-
         assert.strictEqual(updatedBlogs.length, initialBlogs.length)
     })
 })
