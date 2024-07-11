@@ -1,7 +1,6 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const middleware = require('../utils/middleware')
-const _ = require('lodash')
 
 blogsRouter.get('/', async (req, res, next) => {
     try {

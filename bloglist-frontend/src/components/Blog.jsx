@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useState } from 'react'
+import View from './View'
 
 const Blog = ({ blog, addLike, removeBlog }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
-    border: "solid",
+    border: 'solid',
     borderWidth: 1,
     marginBottom: 5,
-  };
+  }
   const [detailsVisibile, setDetailsVisible] = useState(false)
   const showWhenVisible = { display: detailsVisibile ? '' : 'none' }
   const buttonTag = detailsVisibile ? 'Hide' : 'View'
@@ -22,7 +23,7 @@ const Blog = ({ blog, addLike, removeBlog }) => {
     <div style={blogStyle}>
       <div>
         {blog.title} - <i>{blog.author}</i>
-        <button style={{ marginLeft: 10 }} onClick={toggleVisibility}>{buttonTag}</button>
+        <View toggleVisibility={toggleVisibility} buttonTag={buttonTag} />
       </div>
       <div style={showWhenVisible}>
         <p>Url: {blog.url}</p>
@@ -31,7 +32,7 @@ const Blog = ({ blog, addLike, removeBlog }) => {
         <button onClick={handleRemove} >Remove</button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Blog;
+export default Blog
