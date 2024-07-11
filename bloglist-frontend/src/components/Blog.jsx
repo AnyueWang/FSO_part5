@@ -20,7 +20,7 @@ const Blog = ({ blog, addLike, removeBlog }) => {
     }
   }
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog'>
       <div>
         {blog.title} - <i>{blog.author}</i>
         <View toggleVisibility={toggleVisibility} buttonTag={buttonTag} />
