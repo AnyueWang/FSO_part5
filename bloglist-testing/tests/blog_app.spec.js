@@ -1,7 +1,9 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
+const helper = require('./helper')
 
 describe('Blog app', () => {
-  beforeEach(async ({page, request}) => {
+
+  beforeEach(async ({ page, request }) => {
     await request.post('http://localhost:3003/api/testing/reset')
     await request.post('http://localhost:3003/api/users', {
       data: {
@@ -14,56 +16,42 @@ describe('Blog app', () => {
     await page.goto('http://localhost:5173')
   })
 
-  test('Login form is shown', async ({page}) => {
+  test('Login form is shown', async ({ page }) => {
     await expect(page.getByLabel('Username:')).toBeVisible()
-    await expect(page.getByRole('button', {name: 'Login'})).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Login' })).toBeVisible()
   })
 
   describe('Login', () => {
-    test('succeeds with correct credentials', async ({page}) => {
-      await page.getByLabel('Username:').fill('awang')
-      await page.getByLabel('Password:').fill('password')
+    test('succeeds with correct credentials', async ({ page }) => {
+      await helper.login(page, { name: 'Anyue Wang', username: 'awang', password: 'password' })
 
-      await page.getByRole('button', { name: 'Login' }).click()
-
-      await expect(page.getByText('Anyue Wang logged in')).toBeVisible()
+      await expect(page.getByText('Anyue Wang logged in.')).toBeVisible()
     })
 
-    test('fails with wrong credentials', async ({page}) => {
-      await page.getByLabel('Username:').fill('awang')
-      await page.getByLabel('Password:').fill('wrong')
-
-      await page.getByRole('button', { name: 'Login' }).click()
+    test('fails with wrong credentials', async ({ page }) => {
+      await helper.login(page, { name: 'Anyue Wang', username: 'awang', password: 'wrong' })
 
       await expect(page.getByText('invalid username or password')).toBeVisible()
     })
   })
 
   describe('When log in', () => {
-    beforeEach(async ({page}) => {
-      await page.getByLabel('Username:').fill('awang')
-      await page.getByLabel('Password:').fill('password')
-
-      await page.getByRole('button', { name: 'Login' }).click()
+    beforeEach(async ({ page }) => {
+      await helper.login(page, { name: 'Anyue Wang', username: 'awang', password: 'password' })
     })
 
-    test('a new blog can be created', async ({page}) => {
-      await page.getByRole('button', {name: 'New Blog'}).click()
 
-      const title = 'A new blog'
-      const author = 'Someone famous'
+    test('a new blog can be created', async ({ page }) => {
+      await helper.addBlog(page, { title: 'A new blog', author: 'Someone famous', url: 'blog.com' })
 
-      await page.getByLabel('Title:').fill(title)
-      await page.getByLabel('Author:').fill(author)
-      await page.getByLabel('Url:').fill('blog.com')
+      await expect(page.getByText(`A new blog - Someone famous`)).toBeVisible()
+    })
 
-      await page.getByRole('button', {name: 'Create'}).click()
+    test('a new blog can be liked', async ({ page }) => {
+      await helper.addBlog(page, { title: 'A new blog', author: 'Someone famous', url: 'blog.com' })
 
-      await expect(page.getByText(`A new Blog '${title}' by ${author} added.`)).toBeVisible()
-      await expect(page.getByText(`${title} - ${author}`)).toBeVisible()
-
-      await page.getByRole('button', {name: 'View'}).click()
-      await page.getByRole('button', {name: 'like'}).click()
+      await page.getByRole('button', { name: 'View' }).click()
+      await page.getByRole('button', { name: 'like' }).click()
 
       await expect(page.getByText(`Likes: 1`)).toBeVisible()
     })
