@@ -38,4 +38,29 @@ describe('Blog app', () => {
       await expect(page.getByText('invalid username or password')).toBeVisible()
     })
   })
+
+  describe('When log in', () => {
+    beforeEach(async ({page}) => {
+      await page.getByLabel('Username:').fill('awang')
+      await page.getByLabel('Password:').fill('password')
+
+      await page.getByRole('button', { name: 'Login' }).click()
+    })
+
+    test('a new blog can be created', async ({page}) => {
+      await page.getByRole('button', {name: 'New Blog'}).click()
+
+      const title = 'A new blog'
+      const author = 'Someone famous'
+
+      await page.getByLabel('Title:').fill(title)
+      await page.getByLabel('Author:').fill(author)
+      await page.getByLabel('Url:').fill('blog.com')
+
+      await page.getByRole('button', {name: 'Create'}).click()
+
+      await expect(page.getByText(`A new Blog '${title}' by ${author} added.`)).toBeVisible()
+      await expect(page.getByText(`${title} - ${author}`)).toBeVisible()
+    })
+  })
 })
