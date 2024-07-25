@@ -16,6 +16,13 @@ describe('Blog app', () => {
         password,
       }
     })
+    await request.post('/api/users', {
+      data: {
+        name: 'Lisa Li',
+        username: 'lli',
+        password,
+      }
+    })
 
     await page.goto('/')
   })
@@ -27,13 +34,13 @@ describe('Blog app', () => {
 
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
-      await helper.login(page, { name, username, password })
+      await helper.login(page, { username, password })
 
       await expect(page.getByText(`${name} logged in.`)).toBeVisible()
     })
 
     test('fails with wrong credentials', async ({ page }) => {
-      await helper.login(page, { name, username, password: 'wrong' })
+      await helper.login(page, { username, password: 'wrong' })
 
       await expect(page.getByText('invalid username or password')).toBeVisible()
     })
@@ -41,7 +48,7 @@ describe('Blog app', () => {
 
   describe('When log in', () => {
     beforeEach(async ({ page }) => {
-      await helper.login(page, { name, username, password })
+      await helper.login(page, { username, password })
     })
 
     const title = 'A new blog'
@@ -72,6 +79,13 @@ describe('Blog app', () => {
         await page.getByRole('button', { name: 'Remove' }).click()
 
         await expect(page.getByText(`You have deleted the blog "${title}".`)).toBeVisible()
+      })
+
+      test('user cannot delete a blog added by another user', async ({ page }) => {
+        await page.getByRole('button', { name: 'logout' }).click()
+        await helper.login(page, { username: 'lli', password: 'password' })
+        await page.getByRole('button', { name: 'View' }).click()
+        await expect(page.getByRole('button', {name: 'Remove'})).toHaveCount(0)
       })
     })
   })

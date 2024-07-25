@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import View from './View'
 
-const Blog = ({ blog, addLike, removeBlog }) => {
+const Blog = ({ blog, addLike, removeBlog, user }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -29,7 +29,7 @@ const Blog = ({ blog, addLike, removeBlog }) => {
         <p>Url: {blog.url}</p>
         <p>Likes: {blog.likes} <button onClick={handleLike}>like</button></p>
         <p>User: {blog.user ? blog.user.name : ''}</p>
-        <button onClick={handleRemove} >Remove</button>
+        <button onClick={handleRemove} hidden={blog.user ? blog.user.username !== user.username : true} >Remove</button>
       </div>
     </div>
   )

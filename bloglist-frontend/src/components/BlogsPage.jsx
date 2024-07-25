@@ -15,7 +15,7 @@ const BlogsPage = ({ blogs, user, onClickLogout, createBlog, addLike, removeBlog
         />
       </NewBlog>
       {blogs.sort((a, b) => b.likes - a.likes).map(blog => {
-        return <Blog key={blog.id} blog={blog} addLike={addLike} removeBlog={removeBlog} />
+        return <Blog key={blog.id} blog={blog} addLike={addLike} removeBlog={removeBlog} user={user} />
       }
       )}
     </div>
