@@ -1,15 +1,19 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
 const helper = require('./helper')
+const { before } = require('node:test')
 
 describe('Blog app', () => {
+  const name = 'Anyue Wang'
+  const username = 'awang'
+  const password = 'password'
 
   beforeEach(async ({ page, request }) => {
     await request.post('http://localhost:3003/api/testing/reset')
     await request.post('http://localhost:3003/api/users', {
       data: {
-        name: 'Anyue Wang',
-        username: 'awang',
-        password: 'password'
+        name,
+        username,
+        password,
       }
     })
 
@@ -23,13 +27,13 @@ describe('Blog app', () => {
 
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
-      await helper.login(page, { name: 'Anyue Wang', username: 'awang', password: 'password' })
+      await helper.login(page, { name, username, password })
 
-      await expect(page.getByText('Anyue Wang logged in.')).toBeVisible()
+      await expect(page.getByText(`${name} logged in.`)).toBeVisible()
     })
 
     test('fails with wrong credentials', async ({ page }) => {
-      await helper.login(page, { name: 'Anyue Wang', username: 'awang', password: 'wrong' })
+      await helper.login(page, { name, username, password: 'wrong' })
 
       await expect(page.getByText('invalid username or password')).toBeVisible()
     })
@@ -37,23 +41,38 @@ describe('Blog app', () => {
 
   describe('When log in', () => {
     beforeEach(async ({ page }) => {
-      await helper.login(page, { name: 'Anyue Wang', username: 'awang', password: 'password' })
+      await helper.login(page, { name, username, password })
     })
 
+    const title = 'A new blog'
+    const author = 'Someone famous'
+    const url = 'blog.com'
 
     test('a new blog can be created', async ({ page }) => {
-      await helper.addBlog(page, { title: 'A new blog', author: 'Someone famous', url: 'blog.com' })
+      await helper.addBlog(page, { title, author, url })
 
-      await expect(page.getByText(`A new blog - Someone famous`)).toBeVisible()
+      await expect(page.getByText(`${title} - ${author}`)).toBeVisible()
     })
 
-    test('a new blog can be liked', async ({ page }) => {
-      await helper.addBlog(page, { title: 'A new blog', author: 'Someone famous', url: 'blog.com' })
+    describe('and a new blog is created', () => {
+      beforeEach(async ({ page }) => {
+        await helper.addBlog(page, { title, author, url })
+      })
 
-      await page.getByRole('button', { name: 'View' }).click()
-      await page.getByRole('button', { name: 'like' }).click()
+      test('a new blog can be liked', async ({ page }) => {
+        await page.getByRole('button', { name: 'View' }).click()
+        await page.getByRole('button', { name: 'like' }).click()
 
-      await expect(page.getByText(`Likes: 1`)).toBeVisible()
+        await expect(page.getByText(`Likes: 1`)).toBeVisible()
+      })
+
+      test('a blog can be deleted', async ({ page }) => {
+        await page.getByRole('button', { name: 'View' }).click()
+        page.on('dialog', dialog => dialog.accept())
+        await page.getByRole('button', { name: 'Remove' }).click()
+
+        await expect(page.getByText(`You have deleted the blog "${title}".`)).toBeVisible()
+      })
     })
   })
 })

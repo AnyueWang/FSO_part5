@@ -86,7 +86,7 @@ const App = () => {
         if (eachBlog.id !== blog.id) return eachBlog
       })
       setBlogs(updatedBlogs)
-      setOperationMessage(`You have deleted the blog "${blog.title}."`)
+      setOperationMessage(`You have deleted the blog "${blog.title}".`)
       setTimeout(() => setOperationMessage(null), 5000)
     })
       .catch((error) => {
