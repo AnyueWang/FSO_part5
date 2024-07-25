@@ -104,9 +104,7 @@ const App = () => {
       blogService.getAll().then((blogs) => setBlogs(blogs))
     }
   }, [])
-
-  console.log(user)
-
+  
   return (
     <div>
       <h1>{user === null ? 'Log in to application' : 'Blogs'}</h1>

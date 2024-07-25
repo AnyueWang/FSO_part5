@@ -13,6 +13,7 @@ const addBlog = async (page, { title, author, url }) => {
   await page.getByLabel('Url:').fill(url)
 
   await page.getByRole('button', { name: 'Create' }).click()
+  await page.getByText(`${title} - ${author}`).waitFor()
 }
 
 module.exports = {

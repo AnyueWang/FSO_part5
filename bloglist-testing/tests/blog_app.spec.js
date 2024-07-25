@@ -51,8 +51,8 @@ describe('Blog app', () => {
       await helper.login(page, { username, password })
     })
 
-    const title = 'A new blog'
-    const author = 'Someone famous'
+    const title = 'First blog'
+    const author = 'First person'
     const url = 'blog.com'
 
     test('a new blog can be created', async ({ page }) => {
@@ -86,6 +86,22 @@ describe('Blog app', () => {
         await helper.login(page, { username: 'lli', password: 'password' })
         await page.getByRole('button', { name: 'View' }).click()
         await expect(page.getByRole('button', {name: 'Remove'})).toHaveCount(0)
+      })
+
+      test('blogs are sorted in the descending order of likes', async ({ page }) => {
+        await helper.addBlog(page, { title: 'Second blog', author: 'Second person', url: 'nothing.com' })
+
+        const allBlogElements = await page.locator('.blog')
+        
+        const secondBlogElement = await allBlogElements.last()
+        await expect(secondBlogElement).toContainText('Second')
+
+        await secondBlogElement.getByRole('button').click()
+        await expect(secondBlogElement).toContainText('Likes: 0')
+        await secondBlogElement.getByRole('button', {name: 'like'}).click()
+
+        await expect(page.locator('.blog').first()).toContainText('Likes: 1')
+        await expect(page.locator('.blog').first()).toContainText('Second')
       })
     })
   })
